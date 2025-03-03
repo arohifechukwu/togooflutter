@@ -200,7 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  /// **Firebase Signup & Firestore User Storage**
+
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_termsAccepted) {
@@ -221,26 +221,38 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     try {
-      UserCredential userCredential =
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      // ✅ Step 1: Register User in Firebase Authentication
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
       String uid = userCredential.user!.uid;
-      await _db.collection("users").doc(uid).set({
+
+      // ✅ Step 2: Prepare User Data for Firestore
+      Map<String, dynamic> userData = {
         "name": name,
         "email": email,
         "phone": phone,
         "address": address,
         "role": "customer",
-        "createdAt": FieldValue.serverTimestamp(),
-      });
+        "createdAt": FieldValue.serverTimestamp(), // 🔄 Proper timestamp usage
+      };
 
+      // ✅ Step 3: Store User Data in Firestore
+      await _db.collection("users").doc(uid).set(userData);
+
+      // ✅ Step 4: Show Success Message & Navigate to Login
       Fluttertoast.showToast(msg: "Signup successful!");
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => LoginScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+
+    } on FirebaseAuthException catch (e) {
+      Fluttertoast.showToast(msg: "Signup failed: ${e.message}");
     } catch (e) {
-      Fluttertoast.showToast(msg: "Signup failed: ${e.toString()}");
+      Fluttertoast.showToast(msg: "Unexpected Error: ${e.toString()}");
     }
   }
+
 
   /// **Password Strength Validation**
   bool isValidPassword(String password) {

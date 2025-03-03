@@ -90,4 +90,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'togoo-a70f2.firebasestorage.app',
     measurementId: 'G-7X3E0V2Q0Q',
   );
+
 }
