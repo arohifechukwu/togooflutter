@@ -1,8 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'login_screen.dart';
+import 'registration_screen.dart'; // Import Registration Screen
+import 'password_reset_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -11,7 +13,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final DatabaseReference _db = FirebaseDatabase.instance.ref();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -120,7 +122,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ElevatedButton(
                     onPressed: _registerUser,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonDefault, // Updated button color
+                      backgroundColor: buttonDefault,
                       minimumSize: Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -131,22 +133,38 @@ class _SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(color: white, fontSize: 16),
                     ),
                   ),
+
+                  const SizedBox(height: 20),
+
+                  // Login Link
+                  GestureDetector(
+                    onTap: () => Navigator.pushReplacement(
+                        context, MaterialPageRoute(builder: (_) => LoginScreen())),
+                    child: Text(
+                      "Already registered? Log In",
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Business Registration Link
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                        context, MaterialPageRoute(builder: (_) => RegistrationScreen())),
+                    child: Text(
+                      "Are you a Driver or Restaurant? Register Here!",
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Login Link
-            GestureDetector(
-              onTap: () => Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => LoginScreen())),
-              child: Text(
-                "Already registered? Log In",
-                style: TextStyle(
-                  color: primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
               ),
             ),
           ],
@@ -200,7 +218,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-
+  /// **Register User and Write to Firebase Realtime Database**
   Future<void> _registerUser() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_termsAccepted) {
@@ -213,15 +231,8 @@ class _SignupScreenState extends State<SignupScreen> {
     String phone = _phoneController.text.trim();
     String address = _addressController.text.trim();
     String password = _passwordController.text.trim();
-    String confirmPassword = _confirmPasswordController.text.trim();
-
-    if (password != confirmPassword) {
-      Fluttertoast.showToast(msg: "Passwords do not match!");
-      return;
-    }
 
     try {
-      // ✅ Step 1: Register User in Firebase Authentication
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -229,30 +240,23 @@ class _SignupScreenState extends State<SignupScreen> {
 
       String uid = userCredential.user!.uid;
 
-      // ✅ Step 2: Prepare User Data for Firestore
-      Map<String, dynamic> userData = {
+      // Store user data in Firebase Realtime Database
+      await _db.child("customer").child(uid).set({
         "name": name,
         "email": email,
         "phone": phone,
         "address": address,
         "role": "customer",
-        "createdAt": FieldValue.serverTimestamp(), // 🔄 Proper timestamp usage
-      };
+        "createdAt": DateTime.now().toIso8601String(),
+      });
 
-      // ✅ Step 3: Store User Data in Firestore
-      await _db.collection("users").doc(uid).set(userData);
-
-      // ✅ Step 4: Show Success Message & Navigate to Login
       Fluttertoast.showToast(msg: "Signup successful!");
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
 
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: "Signup failed: ${e.message}");
-    } catch (e) {
-      Fluttertoast.showToast(msg: "Unexpected Error: ${e.toString()}");
     }
   }
-
 
   /// **Password Strength Validation**
   bool isValidPassword(String password) {

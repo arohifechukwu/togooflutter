@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,7 +16,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseDatabase _db = FirebaseDatabase.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -45,15 +45,9 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-
               // Logo
-              Image.asset(
-                'assets/logo.png',
-                width: 150,
-                height: 150,
-              ),
+              Image.asset('assets/logo.png', width: 150, height: 150),
               const SizedBox(height: 20),
-
               // Slogan
               Text(
                 "Bringing Your Cravings Home!",
@@ -92,11 +86,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) => value!.isEmpty ? "Enter your email" : null,
                     ),
                     const SizedBox(height: 16),
-
                     // Password Field with Visibility Toggle
                     TextFormField(
                       controller: _passwordController,
-                      obscureText: !_passwordVisible, // Toggle visibility
+                      obscureText: !_passwordVisible,
                       decoration: InputDecoration(
                         labelText: "Password",
                         border: OutlineInputBorder(),
@@ -119,12 +112,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) => value!.isEmpty ? "Enter your password" : null,
                     ),
                     const SizedBox(height: 16),
-
                     // Login Button
                     ElevatedButton(
                       onPressed: () => _loginUser(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: buttonDefault, // Updated button color
+                        backgroundColor: buttonDefault,
                         minimumSize: Size(double.infinity, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -135,24 +127,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
               // Signup & Forgot Password Links
               GestureDetector(
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SignupScreen())),
                 child: Text(
                   "Haven't Registered? Signup",
-                  style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold), // Updated color
+                  style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 10),
-
               GestureDetector(
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PasswordResetScreen())),
                 child: Text(
                   "Forgot Your Password? Reset It.",
-                  style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold), // Updated color
+                  style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -162,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /// **Login Functionality with Firebase Auth & Firestore User Role Validation**
+  /// **Login Functionality with Firebase Auth & Realtime Database Role Validation**
   Future<void> _loginUser() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -172,42 +161,63 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
       String uid = userCredential.user!.uid;
-
-      _validateUserRole(uid);
+      await _validateUserRole(uid);
     } catch (e) {
       Fluttertoast.showToast(msg: "Login failed! Check your credentials.", gravity: ToastGravity.CENTER);
     }
   }
 
-  /// **Validate User Role in Firestore and Navigate to the Correct Screen**
+  /// **Validate User Role from Realtime Database and Navigate to the Correct Screen**
   Future<void> _validateUserRole(String uid) async {
-    DocumentSnapshot userDoc = await _db.collection("users").doc(uid).get();
+    // List of nodes to check
+    List<String> branches = ["customer", "admin", "restaurant", "driver"];
+    String? role;
 
-    if (userDoc.exists) {
-      String role = userDoc['role'] ?? 'customer';
-      Widget nextScreen;
-
-      switch (role) {
-        case 'customer':
-          nextScreen = CustomerHome();
-          break;
-        case 'driver':
-          nextScreen = DriverHome();
-          break;
-        case 'restaurant':
-          nextScreen = RestaurantHome();
-          break;
-        case 'admin':
-          nextScreen = AdminHome();
-          break;
-        default:
-          nextScreen = CustomerHome();
+    // Recursive check of nodes
+    Future<void> checkRoleInBranch(int index) async {
+      if (index >= branches.length) {
+        Fluttertoast.showToast(msg: "User role not found!", gravity: ToastGravity.CENTER);
+        return;
       }
 
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => nextScreen));
-    } else {
-      Fluttertoast.showToast(msg: "User role not found!", gravity: ToastGravity.CENTER);
+      String branch = branches[index];
+      DatabaseReference userRef = _db.ref().child(branch).child(uid);
+      DataSnapshot snapshot = await userRef.get();
+
+      if (snapshot.exists && snapshot.value != null) {
+        Map data = snapshot.value as Map;
+        role = data['role'];
+        if (role != null) {
+          _navigateToDashboard(role!);
+          return;
+        }
+      }
+      // If not found, check the next branch
+      await checkRoleInBranch(index + 1);
     }
+
+    await checkRoleInBranch(0);
+  }
+
+  /// **Navigate to the correct dashboard based on role**
+  void _navigateToDashboard(String role) {
+    Widget nextScreen;
+    switch (role.toLowerCase()) {
+      case 'customer':
+        nextScreen = CustomerHome();
+        break;
+      case 'driver':
+        nextScreen = DriverHome();
+        break;
+      case 'restaurant':
+        nextScreen = RestaurantHome();
+        break;
+      case 'admin':
+        nextScreen = AdminHome();
+        break;
+      default:
+        nextScreen = CustomerHome();
+    }
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => nextScreen));
   }
 }
-
