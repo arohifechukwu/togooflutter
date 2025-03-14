@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -6,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:togoo/registration_status.dart';
 import 'login_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -31,12 +31,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _restaurantLicenseUrlController = TextEditingController();
   final TextEditingController _retailLicenseUrlController = TextEditingController();
 
-  String _selectedBusinessType = "driver"; // Default selection
+  String _selectedBusinessType = "Driver"; // Default selection
   bool _termsAccepted = false;
   bool _isLoading = false;
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
   Map<String, File?> _selectedFiles = {};
+
 
   // Define color palette
   final Color primaryColor = Color(0xFFF18D34); // Dark Orange
@@ -53,7 +54,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: white,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
         child: Column(
@@ -67,8 +68,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
             // Slogan
             Text(
-              "Bringing Your Cravings Home!",
-              style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic, color: darkGray),
+              "Register Your Business",
+              style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic, color: Colors.grey[700]),
             ),
             const SizedBox(height: 30),
 
@@ -77,17 +78,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
             const SizedBox(height: 20),
 
-            // Signup Button
+            // Register Button
             ElevatedButton(
               onPressed: _registerUser,
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
+                backgroundColor: Colors.orange,
                 minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: _isLoading
-                  ? CircularProgressIndicator(color: white)
-                  : Text("Register", style: TextStyle(color: white, fontSize: 16)),
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text("Register", style: TextStyle(color: Colors.white, fontSize: 16)),
             ),
 
             const SizedBox(height: 20),
@@ -95,7 +96,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             // Login Link
             GestureDetector(
               onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen())),
-              child: Text("Already registered? Log In", style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+              child: Text("Already registered? Log In", style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -111,7 +112,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         _buildTextField(_phoneController, "Phone", TextInputType.phone),
         _buildTextField(_addressController, "Address"),
 
-        // Password Fields with Visibility Toggle and Validation
+        // Password Fields
         _buildPasswordField(_passwordController, "Password", _passwordVisible, () {
           setState(() {
             _passwordVisible = !_passwordVisible;
@@ -139,14 +140,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         const SizedBox(height: 10),
 
         // File Upload Fields or URL Entry (Driver)
-        if (_selectedBusinessType == "driver") ...[
+        if (_selectedBusinessType.toLowerCase() == "driver") ...[
           _buildFilePicker("Driver License", "driverLicense"),
           _buildTextField(_driverLicenseUrlController, "Driver License URL"),
           _buildFilePicker("Vehicle Registration", "vehicleRegistration"),
           _buildTextField(_vehicleRegistrationUrlController, "Vehicle Registration URL"),
         ],
         // File Upload Fields or URL Entry (Restaurant)
-        if (_selectedBusinessType == "restaurant") ...[
+        if (_selectedBusinessType.toLowerCase() == "restaurant") ...[
           _buildFilePicker("Restaurant License", "restaurantLicense"),
           _buildTextField(_restaurantLicenseUrlController, "Restaurant License URL"),
           _buildFilePicker("Retail License", "retailLicense"),
@@ -155,11 +156,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
         // Terms & Conditions Checkbox
         CheckboxListTile(
-          value: _termsAccepted,
-          onChanged: (value) => setState(() => _termsAccepted = value!),
-          title: Text("I agree to Terms & Conditions", style: TextStyle(color: darkGray)),
-          controlAffinity: ListTileControlAffinity.leading,
-          activeColor: primaryColor,
+        value: _termsAccepted,
+        onChanged: (value) => setState(() => _termsAccepted = value!),
+    title: Text("I agree to Terms & Conditions", style: TextStyle(color: darkGray)),
+    controlAffinity: ListTileControlAffinity.leading,
+    activeColor: primaryColor,
         ),
       ],
     );
@@ -208,7 +209,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         password.contains(RegExp(r'[@#$%^&+=!]'));
   }
 
-
   Widget _buildFilePicker(String label, String key) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +251,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       String uid = userCredential.user!.uid;
-      String dbChild = _selectedBusinessType.toLowerCase(); // "driver" or "restaurant"
+      String dbChild = _selectedBusinessType.toLowerCase();
 
       DatabaseReference userRef = _db.ref().child(dbChild).child(uid);
 
@@ -261,6 +261,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         "phone": _phoneController.text.trim(),
         "address": _addressController.text.trim(),
         "role": _selectedBusinessType,
+        "status": "pending"
       };
 
       // Store URLs if provided
@@ -293,7 +294,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       await userRef.set(userData);
       Fluttertoast.showToast(msg: "Registration Successful!");
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => RegistrationStatusScreen()));
 
     } catch (e) {
       Fluttertoast.showToast(msg: "Registration failed: ${e.toString()}");

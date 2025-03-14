@@ -40,6 +40,7 @@ dependencies:
   google_fonts: ^6.1.0
   firebase_storage: ^12.4.4
   file_picker: ^5.2.0
+  shared_preferences: any
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -66,6 +67,25 @@ flutter:
   assets:
     - assets/logo.png
     - assets/customer_login.png
+    - assets/icons/ic_dashboard.png
+    - assets/icons/ic_users.png
+    - assets/icons/ic_approvals.png
+    - assets/icons/ic_transaction.png
+    - assets/icons/ic_settings.png
+    - assets/icons/ic_dashboard_active.png
+    - assets/icons/ic_users_active.png
+    - assets/icons/ic_approvals_active.png
+    - assets/icons/ic_transaction_active.png
+    - assets/icons/ic_settings_active.png
+    - assets/icons/ic_logout.png
+    - assets/icons/ic_profile.png
+    - assets/icons/ic_notifications.png
+    - assets/icons/ic_language.png
+    - assets/icons/ic_info.png
+    - assets/icons/ic_faq.png
+    - assets/icons/ic_dark_mode.png
+
+
 
 
   # The following line ensures that the Material Icons font is
