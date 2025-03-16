@@ -1,10 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'admin_home.dart';
-import 'users_screen.dart';
-import 'approvals_screen.dart';
-import 'transaction_screen.dart';
+import 'admin_bottom_navigation_menu.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -143,46 +140,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
 
-      /// ✅ Bottom Navigation with PNG Icons
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 4, // Settings screen index
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          if (index == 0) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => AdminHome()));
-          if (index == 1) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => UsersScreen()));
-          if (index == 2) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ApprovalsScreen()));
-          if (index == 3) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => TransactionScreen()));
-          if (index == 4) return; // Stay on Settings
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_dashboard.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_dashboard_active.png", width: 24, height: 24),
-            label: "Dashboard",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_users.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_users_active.png", width: 24, height: 24),
-            label: "Users",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_approvals.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_approvals_active.png", width: 24, height: 24),
-            label: "Approvals",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_transaction.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_transaction_active.png", width: 24, height: 24),
-            label: "Transaction",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_settings.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_settings_active.png", width: 24, height: 24),
-            label: "Settings",
-          ),
-        ],
-      ),
+      /// ✅ Bottom Navigation (Fixed `currentIndex: 4` to highlight "Settings")
+      bottomNavigationBar: AdminBottomNavigationMenu(currentIndex: 4),
     );
   }
 }

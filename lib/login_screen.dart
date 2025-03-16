@@ -50,23 +50,77 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
             Text("Bringing Your Cravings Home!",
                 style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic, color: darkGray)),
-            const SizedBox(height: 50),
+            const SizedBox(height: 100),
+
+            //Customer Login Image
+              GestureDetector(
+                onTap: () {}, // Placeholder for action
+                child: Image.asset(
+                  'assets/customer_login.png',
+                  width: 200,
+                  height: 50,
+                ),
+              ),
+              const SizedBox(height: 30),
+
 
             // Login Form
             Form(
               key: _formKey,
               child: Column(
                 children: [
-                  _buildTextField(_emailController, "Email", TextInputType.emailAddress),
+                  // Email Field
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(color: darkGray),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: primaryVariant),
+                      ),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) => value!.isEmpty ? "Enter your email" : null,
+                  ),
                   const SizedBox(height: 16),
-                  _buildPasswordField(),
+
+                  // Password Field with Visibility Toggle
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: !_passwordVisible,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(color: darkGray),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: primaryVariant),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                          color: darkGray,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _passwordVisible = !_passwordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                    validator: (value) => value!.isEmpty ? "Enter your password" : null,
+                  ),
                   const SizedBox(height: 16),
+
+                  // Login Button
                   ElevatedButton(
                     onPressed: _loginUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: buttonDefault,
                       minimumSize: Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     child: Text("Login", style: TextStyle(color: white, fontSize: 16)),
                   ),

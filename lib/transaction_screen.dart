@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'admin_bottom_navigation_menu.dart';
 
 class TransactionScreen extends StatelessWidget {
   @override
@@ -14,6 +15,7 @@ class TransactionScreen extends StatelessWidget {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
+      bottomNavigationBar: AdminBottomNavigationMenu(currentIndex: 3),
     );
   }
 }

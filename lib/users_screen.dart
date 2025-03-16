@@ -3,10 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'admin_home.dart';
-import 'approvals_screen.dart';
-import 'settings_screen.dart';
-import 'transaction_screen.dart';
+import 'admin_bottom_navigation_menu.dart';
 import 'user_tile.dart';
 import 'user_model.dart';
 
@@ -29,7 +26,7 @@ class _UsersScreenState extends State<UsersScreen> {
     _fetchUsers();
   }
 
-  /// ✅ Fetch users from Realtime Database & Firestore (following Java logic)
+  /// ✅ Fetch users from Realtime Database & Firestore
   void _fetchUsers() async {
     _users.clear();
 
@@ -57,7 +54,7 @@ class _UsersScreenState extends State<UsersScreen> {
     });
   }
 
-  /// ✅ Fetch users from Realtime Database (Mirrors Java `checkUsersInNode`)
+  /// ✅ Fetch users from Realtime Database
   Future<void> _fetchUsersFromRealtimeDB(String node) async {
     _dbRef.child(node).onValue.listen((event) {
       final snapshot = event.snapshot;
@@ -81,7 +78,7 @@ class _UsersScreenState extends State<UsersScreen> {
     });
   }
 
-  /// ✅ Fetch users from Firestore (Mirrors Java `fetchUsersFromFirestore`)
+  /// ✅ Fetch users from Firestore
   Future<void> _fetchUsersFromFirestore() async {
     try {
       final snapshot = await _firestore.collection("users").get();
@@ -95,7 +92,7 @@ class _UsersScreenState extends State<UsersScreen> {
     }
   }
 
-  /// ✅ Update User Status (Suspend / Reactivate)
+  /// ✅ Update User Status
   void _updateUserStatus(UserModel user, String status) {
     _dbRef.child(user.role).child(user.userId).update({"status": status}).then((_) {
       setState(() {
@@ -119,31 +116,6 @@ class _UsersScreenState extends State<UsersScreen> {
     });
   }
 
-  /// ✅ Bottom Navigation Handling (Same as Java)
-  void _navigateToPage(int index) {
-    Widget nextScreen;
-    switch (index) {
-      case 0:
-        nextScreen = AdminHome();
-        break;
-      case 1:
-        nextScreen = UsersScreen();
-        break;
-      case 2:
-        nextScreen = ApprovalsScreen();
-        break;
-      case 3:
-        nextScreen = TransactionScreen();
-        break;
-      case 4:
-        nextScreen = SettingsScreen();
-        break;
-      default:
-        return;
-    }
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => nextScreen));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,7 +124,8 @@ class _UsersScreenState extends State<UsersScreen> {
           ? Center(child: CircularProgressIndicator())
           : _users.isEmpty
           ? Center(
-        child: Text("No records found", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        child: Text("No records found",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
       )
           : ListView.builder(
         padding: EdgeInsets.all(10),
@@ -166,39 +139,7 @@ class _UsersScreenState extends State<UsersScreen> {
           );
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        onTap: _navigateToPage,
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_dashboard.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_dashboard_active.png", width: 24, height: 24),
-            label: "Dashboard",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_users.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_users_active.png", width: 24, height: 24),
-            label: "Users",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_approvals.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_approvals_active.png", width: 24, height: 24),
-            label: "Approvals",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_transaction.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_transaction_active.png", width: 24, height: 24),
-            label: "Transaction",
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset("assets/icons/ic_settings.png", width: 24, height: 24),
-            activeIcon: Image.asset("assets/icons/ic_settings_active.png", width: 24, height: 24),
-            label: "Settings",
-          ),
-        ],
-      ),
+      bottomNavigationBar: AdminBottomNavigationMenu(currentIndex: 1),
     );
   }
 }

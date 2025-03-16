@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'user_model.dart';
 
@@ -76,7 +75,7 @@ class AdminUserTile extends StatelessWidget {
               children: [
                 Icon(Icons.badge, color: secondaryColor, size: 18),
                 const SizedBox(width: 8),
-                Text("Role: ${user.role}", style: TextStyle(fontSize: 14, color: primaryColor)),
+                Text("Role: ${user.role}", style: TextStyle(fontSize: 14, color: darkGray)),
               ],
             ),
             const SizedBox(height: 4),
@@ -86,7 +85,7 @@ class AdminUserTile extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   "Status: ${user.status}",
-                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: darkGray),
+                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic, color: primaryVariant),
                 ),
               ],
             ),

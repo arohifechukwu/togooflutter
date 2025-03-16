@@ -41,7 +41,7 @@ class UserTile extends StatelessWidget {
             // User Info
             Row(
               children: [
-                Icon(Icons.person, color: Colors.orange, size: 24),
+                Icon(Icons.person, color: darkGray, size: 24),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -75,17 +75,17 @@ class UserTile extends StatelessWidget {
 
             Row(
               children: [
-                Icon(Icons.badge, color: primaryVariant, size: 18),
+                Icon(Icons.badge, color: darkGray, size: 18),
                 const SizedBox(width: 8),
-                Text("Role: ${user.role}",
-                    style: TextStyle(fontSize: 14, color: primaryVariant)),
+                Text(user.role,
+                    style: TextStyle(fontSize: 14, color: darkGray)),
               ],
             ),
             const SizedBox(height: 4),
 
             Row(
               children: [
-                Icon(Icons.info, color: Colors.grey[600], size: 18),
+                Icon(Icons.info, color: primaryColor, size: 18),
                 const SizedBox(width: 8),
                 Text(
                   "Status: ${user.status}",
@@ -93,8 +93,8 @@ class UserTile extends StatelessWidget {
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
                     color: user.status == "suspended"
-                        ? darkGray
-                        : darkGray,
+                        ? primaryColor
+                        : primaryVariant,
                   ),
                 ),
               ],
@@ -139,7 +139,7 @@ class UserTile extends StatelessWidget {
                   icon: Icon(Icons.delete, color: Colors.white),
                   label: Text("Delete", style: TextStyle(color: Colors.white)),
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor: primaryVariant,
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
