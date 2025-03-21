@@ -41,6 +41,13 @@ dependencies:
   firebase_storage: ^12.4.4
   file_picker: ^5.2.0
   shared_preferences: any
+  cached_network_image: ^3.3.0
+  location: ^5.0.3
+  geocoding: ^2.1.0
+  flutter_svg: ^2.0.7
+  image_picker: ^1.0.4
+  permission_handler: ^11.1.0
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -69,6 +76,8 @@ flutter:
     - assets/customer_login.png
     - assets/icons/ic_dashboard.png
     - assets/icons/ic_users.png
+    - assets/icons/ic_home.png
+    - assets/icons/ic_account.png
     - assets/icons/ic_approvals.png
     - assets/icons/ic_transaction.png
     - assets/icons/ic_settings.png
@@ -84,6 +93,21 @@ flutter:
     - assets/icons/ic_info.png
     - assets/icons/ic_faq.png
     - assets/icons/ic_dark_mode.png
+    - assets/icons/pizza.png
+    - assets/icons/burger.png
+    - assets/icons/sushi.png
+    - assets/icons/salad.png
+    - assets/icons/spaghetti.png
+    - assets/icons/tacos.png
+    - assets/icons/shrimp.png
+    - assets/icons/cupcake.png
+    - assets/icons/ic_restaurant.png
+    - assets/icons/ic_browse.png
+    - assets/icons/ic_cart.png
+    - assets/icons/ic_order.png
+    - assets/icons/ic_food_category_placeholder.png
+    - assets/icons/ic_buy.svg
+    - assets/icons/ic_add_to_cart.svg
 
 
 

@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'user_model.dart';
-import 'user_tile.dart';
+import '../models/user_model.dart';
+import '../widgets/user_tile.dart';
 
 class UserAdapter extends StatefulWidget {
   @override

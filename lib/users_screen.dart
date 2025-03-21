@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'admin_bottom_navigation_menu.dart';
-import 'user_tile.dart';
-import 'user_model.dart';
+import 'widgets/user_tile.dart';
+import 'models/user_model.dart';
 
 class UsersScreen extends StatefulWidget {
   @override

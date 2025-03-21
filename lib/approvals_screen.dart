@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'admin_bottom_navigation_menu.dart';
-import 'user_model.dart';
-import 'admin_user_tile.dart';
+import 'models/user_model.dart';
+import 'widgets/admin_user_tile.dart';
 
 // ✅ Define color palette
 const Color primaryColor = Color(0xFFF18D34); // Dark Orange

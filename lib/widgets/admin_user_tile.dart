@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'user_model.dart';
+import '../models/user_model.dart';
 
 
 // ✅ Define color palette as global constants
