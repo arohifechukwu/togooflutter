@@ -62,10 +62,8 @@ class _CartScreenState extends State<CartScreen> {
       );
       return;
     }
-    // Navigator.pushNamed(context, "/checkout", arguments: cartItems);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Proceeding to checkout (mock)...")),
-    );
+
+    Navigator.pushNamed(context, "/checkout", arguments: cartItems);
   }
 
   @override
