@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:togoo/admin_home.dart';
 import '../models/cart_item.dart';
 import '../widgets/checkout_adapter.dart';
+import 'customer_home.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<CartItem> cartItems;
@@ -40,6 +42,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  void _cancelOrder() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => CustomerHome()),
+          (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +80,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     minimumSize: const Size.fromHeight(50),
                   ),
                   child: const Text("Proceed to Payment", style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: _cancelOrder,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryVariant,
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  child: const Text("Cancel Order", style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
               ],
             ),
