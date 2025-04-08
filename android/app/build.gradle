@@ -3,11 +3,12 @@ plugins {
     id "com.google.gms.google-services" // Firebase configuration plugin
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
     namespace = "com.example.togoo"
-    compileSdk = 34 // Latest SDK version
+    compileSdk = 35 // Latest SDK version
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -23,7 +24,7 @@ android {
 
         // Fix minSdkVersion by explicitly defining it
         minSdkVersion 23  // Updated from flutter.minSdkVersion
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
 

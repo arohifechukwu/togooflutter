@@ -47,6 +47,11 @@ dependencies:
   flutter_svg: ^2.0.7
   image_picker: ^1.0.4
   permission_handler: ^11.1.0
+  flutter_stripe: ^9.5.0
+  http: ^1.1.0
+  intl: ^0.17.0
+  flutter_rating_bar: ^4.0.0
+  google_maps_flutter: ^2.1.1
 
 
 
@@ -74,40 +79,63 @@ flutter:
   assets:
     - assets/logo.png
     - assets/customer_login.png
-    - assets/icons/ic_dashboard.png
-    - assets/icons/ic_users.png
-    - assets/icons/ic_home.png
-    - assets/icons/ic_account.png
-    - assets/icons/ic_approvals.png
-    - assets/icons/ic_transaction.png
-    - assets/icons/ic_settings.png
-    - assets/icons/ic_dashboard_active.png
-    - assets/icons/ic_users_active.png
-    - assets/icons/ic_approvals_active.png
-    - assets/icons/ic_transaction_active.png
-    - assets/icons/ic_settings_active.png
-    - assets/icons/ic_logout.png
-    - assets/icons/ic_profile.png
-    - assets/icons/ic_notifications.png
-    - assets/icons/ic_language.png
-    - assets/icons/ic_info.png
-    - assets/icons/ic_faq.png
-    - assets/icons/ic_dark_mode.png
-    - assets/icons/pizza.png
-    - assets/icons/burger.png
-    - assets/icons/sushi.png
-    - assets/icons/salad.png
-    - assets/icons/spaghetti.png
-    - assets/icons/tacos.png
-    - assets/icons/shrimp.png
-    - assets/icons/cupcake.png
-    - assets/icons/ic_restaurant.png
-    - assets/icons/ic_browse.png
-    - assets/icons/ic_cart.png
-    - assets/icons/ic_order.png
-    - assets/icons/ic_food_category_placeholder.png
-    - assets/icons/ic_buy.svg
-    - assets/icons/ic_add_to_cart.svg
+    - assets/ic_dashboard.png
+    - assets/ic_users.png
+    - assets/ic_home.png
+    - assets/ic_account.png
+    - assets/ic_approvals.png
+    - assets/ic_transaction.png
+    - assets/ic_settings.png
+    - assets/ic_dashboard_active.png
+    - assets/ic_users_active.png
+    - assets/ic_approvals_active.png
+    - assets/ic_transaction_active.png
+    - assets/ic_settings_active.png
+    - assets/ic_logout.png
+    - assets/ic_profile.png
+    - assets/ic_notifications.png
+    - assets/ic_language.png
+    - assets/ic_info.png
+    - assets/ic_faq.png
+    - assets/ic_dark_mode.png
+    - assets/pizza.png
+    - assets/burger.png
+    - assets/sushi.png
+    - assets/salad.png
+    - assets/spaghetti.png
+    - assets/tacos.png
+    - assets/shrimp.png
+    - assets/cupcake.png
+    - assets/ic_restaurant.png
+    - assets/ic_restaurant_active.png
+    - assets/ic_browse_active.png
+    - assets/ic_browse.png
+    - assets/ic_cart.png
+    - assets/ic_order.png
+    - assets/ic_food_category_placeholder.png
+    - assets/ic_buy.svg
+    - assets/ic_add_to_cart.svg
+    - assets/ic_notification.png
+    - assets/ic_checkbox.png
+    - assets/ic_buy_active.png
+    - assets/ic_buy.png
+    - assets/ic_create_active.png
+    - assets/ic_create.png
+    - assets/ic_report.png
+    - assets/ic_report_active.png
+    - assets/ic_manage.png
+    - assets/ic_manage_active.png
+    - assets/ic_setting_active.png
+    - assets/ic_setting.png
+    - assets/ic_available.png
+    - assets/ic_profile.png
+    - assets/ic_notifications.png
+    - assets/ic_info.png
+    - assets/ic_faq.png
+    - assets/ic_dark_mode.png
+    - assets/ic_language.png
+    - assets/ic_logout.png
+    - assets/ic_car_placeholder.jpg
 
 
 

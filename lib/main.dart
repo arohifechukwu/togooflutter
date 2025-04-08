@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:togoo/featured_category_screen.dart';
 import 'firebase_options.dart';
 import 'food_detail.dart';
 import 'models/food_item.dart';
 import 'screens/splash_screen.dart';
 import 'checkout_screen.dart';
 import 'models/cart_item.dart';
-import '../profile_screen.dart';
-import '../login_screen.dart';
+import 'models/restaurant.dart';
+import 'profile_screen.dart';
+import 'login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,24 +36,32 @@ class MyApp extends StatelessWidget {
       routes: {
         '/profile': (context) => ProfileScreen(),
         '/login': (context) => LoginScreen(),
+        '/featured-category': (context) => FeaturedCategoryScreen(
+          selectedCategory: ModalRoute.of(context)!.settings.arguments as String,
+        ),
 
       },
-
-      // ✅ Dynamic routes
       onGenerateRoute: (settings) {
         if (settings.name == '/checkout') {
-          final args = settings.arguments as List<CartItem>;
+          final args = settings.arguments as Map<String, dynamic>;
+          final cartItems = args['cartItems'] as List<CartItem>;
+          final selectedRestaurant = args['selectedRestaurant'] as Restaurant;
+
           return MaterialPageRoute(
-            builder: (context) => CheckoutScreen(cartItems: args),
+            builder: (context) => CheckoutScreen(
+              cartItems: cartItems,
+              selectedRestaurant: selectedRestaurant,
+            ),
           );
         } else if (settings.name == '/food-detail') {
           final food = settings.arguments as FoodItem;
           return MaterialPageRoute(
             builder: (context) => FoodDetailScreen(
-              foodId: food.id,
-              foodDescription: food.description,
-              foodImage: food.imageUrl,
+              foodId: food.id ?? "",
+              foodDescription: food.description ?? "",
+              foodImage: food.imageUrl ?? "",
               foodPrice: food.price,
+              restaurantId: food.restaurantId, food: food,
             ),
           );
         }

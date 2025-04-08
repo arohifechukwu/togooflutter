@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../models/food_item.dart';
+import '../utils/restaurant_helper.dart';
 import '../widgets/food_adapter.dart';
+import 'models/restaurant.dart';
 
 class FeaturedCategoryScreen extends StatefulWidget {
   final String selectedCategory;
@@ -22,58 +24,65 @@ class _FeaturedCategoryScreenState extends State<FeaturedCategoryScreen> {
     fetchCategoryItems(widget.selectedCategory);
   }
 
-  void fetchCategoryItems(String category) async {
-    final restaurantNames = getRestaurantsForCategory(category);
-    final snapshot = await dbRef.get();
-
-    List<FoodItem> fetchedItems = [];
-
-    for (var restaurant in snapshot.children) {
-      final name = restaurant.child("name").value as String?;
-      if (name != null && restaurantNames.contains(name)) {
-        final menuItems = restaurant.child("menu").child(category);
-        for (var food in menuItems.children) {
-          fetchedItems.add(FoodItem.fromRealtimeDB(food.key!, food.value as Map));
+  void fetchCategoryItems(String category) {
+    foodItemList.clear();
+    dbRef.once().then((DatabaseEvent event) {
+      final snapshot = event.snapshot;
+      for (var restaurant in snapshot.children) {
+        final restaurantId = restaurant.key;
+        final menuSnapshot = restaurant.child("menu").child(category);
+        if (menuSnapshot.exists) {
+          for (var foodSnapshot in menuSnapshot.children) {
+            final id = foodSnapshot.key;
+            final description = foodSnapshot.child("description").value as String?;
+            final imageUrl = foodSnapshot.child("imageURL").value as String?;
+            final priceValue = foodSnapshot.child("price").value;
+            double? price;
+            if (priceValue is double) {
+              price = priceValue;
+            } else if (priceValue is int) {
+              price = priceValue.toDouble();
+            } else if (priceValue is String) {
+              price = double.tryParse(priceValue);
+            }
+            if (id != null && description != null && imageUrl != null && price != null) {
+              FoodItem item = FoodItem(
+                id: id,
+                description: description,
+                imageUrl: imageUrl,
+                restaurantId: restaurantId,
+                price: price,
+              );
+              foodItemList.add(item);
+            }
+          }
         }
       }
-    }
-
-    if (fetchedItems.isEmpty) {
+      if (foodItemList.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No items found for $category")),
+        );
+        Navigator.pop(context);
+      } else {
+        setState(() {}); // Refresh the UI once items are loaded.
+      }
+    }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No items found for ${widget.selectedCategory}")),
+        SnackBar(content: Text("Failed to load items")),
       );
-      Navigator.pop(context);
-    } else {
-      setState(() => foodItemList = fetchedItems);
-    }
-  }
-
-  List<String> getRestaurantsForCategory(String category) {
-    switch (category) {
-      case "Pizza":
-      case "Pasta":
-        return ["American Cuisine", "Italian Cuisine"];
-      case "Burgers":
-      case "Seafood":
-      case "Salads":
-        return ["American Cuisine"];
-      case "Sushi":
-        return ["Japanese Cuisine", "American Cuisine"];
-      case "Tacos":
-        return ["Mexican Cuisine"];
-      case "Desserts":
-        return ["Canadian Dishes"];
-      default:
-        return [];
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.selectedCategory),
+        title: const Text("Featured Category"),
         backgroundColor: Colors.orange,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: foodItemList.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -82,14 +91,14 @@ class _FeaturedCategoryScreenState extends State<FeaturedCategoryScreen> {
         children: [
           FoodAdapter(
             foodList: foodItemList,
-            onFoodClick: (food) {
+            unusedRestaurant: RestaurantHelper.getCurrentRestaurant() ?? Restaurant(), // Provide fallback if needed.
+            listener: (food) {
               Navigator.pushNamed(
                 context,
                 '/food-detail',
                 arguments: food,
               );
             },
-            scrollDirection: Axis.vertical,
           ),
         ],
       ),

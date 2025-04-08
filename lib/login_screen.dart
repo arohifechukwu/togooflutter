@@ -236,10 +236,10 @@ class _LoginScreenState extends State<LoginScreen> {
         nextScreen = CustomerHome();
         break;
       case 'driver':
-        nextScreen = DriverHome();
+        nextScreen = DriverHomeScreen();
         break;
       case 'restaurant':
-        nextScreen = RestaurantHome();
+        nextScreen = RestaurantHomeScreen();
         break;
       case 'admin':
         nextScreen = AdminHome();

@@ -62,8 +62,8 @@ class _RegistrationStatusScreenState extends State<RegistrationStatusScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => role == "driver"
-              ? DriverHome() // Navigate to DriverHome
-              : RestaurantHome(), // Ensure this is implemented
+              ? DriverHomeScreen() // Navigate to DriverHome
+              : RestaurantHomeScreen(), // Ensure this is implemented
         ),
       );
     } else {

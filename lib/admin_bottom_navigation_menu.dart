@@ -44,35 +44,35 @@ class AdminBottomNavigationMenu extends StatelessWidget {
       items: [
         BottomNavigationBarItem(
           icon: Image.asset(
-            currentIndex == 0 ? 'assets/icons/ic_dashboard_active.png' : 'assets/icons/ic_dashboard.png',
+            currentIndex == 0 ? 'assets/ic_dashboard_active.png' : 'assets/ic_dashboard.png',
             width: 24, height: 24,
           ),
           label: "Dashboard",
         ),
         BottomNavigationBarItem(
           icon: Image.asset(
-            currentIndex == 1 ? 'assets/icons/ic_users_active.png' : 'assets/icons/ic_users.png',
+            currentIndex == 1 ? 'assets/ic_users_active.png' : 'assets/ic_users.png',
             width: 24, height: 24,
           ),
           label: "Users",
         ),
         BottomNavigationBarItem(
           icon: Image.asset(
-            currentIndex == 2 ? 'assets/icons/ic_approvals_active.png' : 'assets/icons/ic_approvals.png',
+            currentIndex == 2 ? 'assets/ic_approvals_active.png' : 'assets/ic_approvals.png',
             width: 24, height: 24,
           ),
           label: "Approvals",
         ),
         BottomNavigationBarItem(
           icon: Image.asset(
-            currentIndex == 3 ? 'assets/icons/ic_transaction_active.png' : 'assets/icons/ic_transaction.png',
+            currentIndex == 3 ? 'assets/ic_transaction_active.png' : 'assets/ic_transaction.png',
             width: 24, height: 24,
           ),
           label: "Transaction",
         ),
         BottomNavigationBarItem(
           icon: Image.asset(
-            currentIndex == 4 ? 'assets/icons/ic_settings_active.png' : 'assets/icons/ic_settings.png',
+            currentIndex == 4 ? 'assets/ic_settings_active.png' : 'assets/ic_settings.png',
             width: 24, height: 24,
           ),
           label: "Settings",

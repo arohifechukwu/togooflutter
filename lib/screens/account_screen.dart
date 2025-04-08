@@ -88,27 +88,27 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Column(
           children: [
             _buildCard(
-              iconPath: "assets/icons/ic_profile.png",
+              iconPath: "assets/ic_profile.png",
               label: "Profile",
               onTap: () => Navigator.pushNamed(context, "/profile"),
             ),
             _buildCard(
-              iconPath: "assets/icons/ic_notifications.png",
+              iconPath: "assets/ic_notifications.png",
               label: "Notifications",
               onTap: () => Navigator.pushNamed(context, "/notifications"),
             ),
             _buildCard(
-              iconPath: "assets/icons/ic_info.png",
+              iconPath: "assets/ic_info.png",
               label: "About Us",
               onTap: () => Navigator.pushNamed(context, "/about"),
             ),
             _buildCard(
-              iconPath: "assets/icons/ic_faq.png",
+              iconPath: "assets/ic_faq.png",
               label: "FAQ",
               onTap: () => Navigator.pushNamed(context, "/faq"),
             ),
             _buildCard(
-              iconPath: "assets/icons/ic_language.png",
+              iconPath: "assets/ic_language.png",
               label: "Language",
               onTap: () => Navigator.pushNamed(context, "/language"),
             ),
@@ -119,13 +119,13 @@ class _AccountScreenState extends State<AccountScreen> {
               child: SwitchListTile(
                 value: isDarkMode,
                 onChanged: _toggleTheme,
-                secondary: Image.asset("assets/icons/ic_dark_mode.png", width: 28, height: 28),
+                secondary: Image.asset("assets/ic_dark_mode.png", width: 28, height: 28),
                 title: const Text("Dark Mode"),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
             ),
             _buildCard(
-              iconPath: "assets/icons/ic_logout.png",
+              iconPath: "assets/ic_logout.png",
               label: "Logout",
               onTap: _logoutUser,
             ),
