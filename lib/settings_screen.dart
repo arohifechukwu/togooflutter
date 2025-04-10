@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_bottom_navigation_menu.dart';
 import 'login_screen.dart';
+import 'admin_report_screen.dart'; // Make sure this file exists and contains AdminReportScreen
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadThemePreference();
   }
 
-  /// ✅ Load stored theme preference
+  /// Load stored theme preference
   void _loadThemePreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -27,7 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  /// ✅ Toggle dark mode and save preference
+  /// Toggle dark mode and save preference
   void _toggleTheme(bool isDark) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('darkMode', isDark);
@@ -36,14 +37,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  /// ✅ Logout functionality
+  /// Logout functionality
   void _logoutUser() async {
     await _auth.signOut();
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
   }
 
-  /// ✅ UI for individual setting option with PNG Icons
+  /// UI for individual setting option with PNG icons
   Widget _buildSettingOption({
     required String title,
     required String iconPath,
@@ -56,7 +59,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ListTile(
         leading: Image.asset(iconPath, width: 28, height: 28),
-        title: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
         trailing: trailing,
         onTap: onTap,
       ),
@@ -74,7 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           const SizedBox(height: 20),
 
-          /// ✅ Profile
+          /// Profile
           _buildSettingOption(
             title: "Profile",
             iconPath: "assets/icons/ic_profile.png",
@@ -83,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
-          /// ✅ Notifications
+          /// Notifications
           _buildSettingOption(
             title: "Notifications",
             iconPath: "assets/icons/ic_notifications.png",
@@ -92,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
-          /// ✅ About Us
+          /// About Us
           _buildSettingOption(
             title: "About Us",
             iconPath: "assets/icons/ic_info.png",
@@ -101,7 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
-          /// ✅ FAQ
+          /// FAQ
           _buildSettingOption(
             title: "FAQ",
             iconPath: "assets/icons/ic_faq.png",
@@ -110,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
-          /// ✅ Language
+          /// Language
           _buildSettingOption(
             title: "Language",
             iconPath: "assets/icons/ic_language.png",
@@ -119,7 +125,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
-          /// ✅ Dark Mode Toggle
+          /// Reports Option (New)
+          _buildSettingOption(
+            title: "Reports",
+            iconPath: "assets/icons/ic_reports.png", // Provide a valid asset
+            onTap: () {
+              // When tapped, navigate to the admin report page.
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminReportScreen()),
+              );
+            },
+          ),
+
+          /// Dark Mode Toggle
           _buildSettingOption(
             title: "Dark Mode",
             iconPath: "assets/icons/ic_dark_mode.png",
@@ -129,7 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
-          /// ✅ Logout
+          /// Logout
           _buildSettingOption(
             title: "Logout",
             iconPath: "assets/icons/ic_logout.png",
@@ -140,7 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
 
-      /// ✅ Bottom Navigation (Fixed `currentIndex: 4` to highlight "Settings")
+      /// Bottom Navigation (Fixed currentIndex: 4 to highlight "Settings")
       bottomNavigationBar: AdminBottomNavigationMenu(currentIndex: 4),
     );
   }
