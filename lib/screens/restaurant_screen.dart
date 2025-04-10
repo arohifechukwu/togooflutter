@@ -3,18 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:intl/intl.dart';
 
+import '../cart_screen.dart';
 import '../models/location_coordinates.dart';
+import '../models/operating_hours.dart';
 import '../models/restaurant.dart';
-import '../models/food_category.dart';
 import '../models/food_item.dart';
+import '../utils/restaurant_helper.dart';
 import '../widgets/food_adapter.dart';
 import '../widgets/food_category_adapter.dart';
-import '../cart_screen.dart';
+import '../widgets/restaurant_tile.dart';
+import '../models/food_category.dart';
 import '../customer_home.dart' as home;
 import '../view_all.dart';
 import '../customer_bottom_navigation_menu.dart';
-import '../restaurant_page.dart'; // Import restaurant page screen
+import '../restaurant_page.dart'; // This file displays the selected restaurant.
 
 class RestaurantScreen extends StatefulWidget {
   const RestaurantScreen({Key? key}) : super(key: key);
@@ -33,9 +37,10 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
   List<FoodItem> specialOffers = [];
   List<FoodItem> topPicks = [];
 
+  // Use the same FoodAdapter for search (if needed).
   late FoodAdapter searchAdapter;
 
-  int _currentIndex = 1;  // Use appropriate index for "Restaurant" tab
+  int _currentIndex = 1; // Use appropriate index for the "Restaurant" tab.
 
   @override
   void initState() {
@@ -43,6 +48,7 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
 
     searchAdapter = FoodAdapter(
       foodList: [],
+      // Provide an empty Restaurant as unusedRestaurant; adjust as needed.
       unusedRestaurant: Restaurant(),
       listener: (FoodItem food) {
         Navigator.pushNamed(context, '/food-detail', arguments: food);
@@ -94,15 +100,19 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
           for (DataSnapshot foodSnap in category.children) {
             String? foodId = foodSnap.key;
             if (foodId != null) {
-              FoodItem item = FoodItem.fromRealtimeDB(
-                foodId,
-                Map<String, dynamic>.from(foodSnap.value as Map),
-                restaurantId ?? "",
-              );
-              if (foodId.toLowerCase().startsWith(queryLower)) {
-                prefixMatches.add(item);
-              } else if (foodId.toLowerCase().contains(queryLower)) {
-                substringMatches.add(item);
+              try {
+                FoodItem item = FoodItem.fromRealtimeDB(
+                  foodId,
+                  Map<String, dynamic>.from(foodSnap.value as Map),
+                  restaurantId ?? "",
+                );
+                if (foodId.toLowerCase().startsWith(queryLower)) {
+                  prefixMatches.add(item);
+                } else if (foodId.toLowerCase().contains(queryLower)) {
+                  substringMatches.add(item);
+                }
+              } catch (e) {
+                // Skip items that cause errors.
               }
             }
           }
@@ -124,6 +134,7 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
     double userLat = 0.0;
     double userLon = 0.0;
 
+    // Try to get the customer's location.
     for (String role in roles) {
       DataSnapshot snapshot = await rootRef.child(role).child(uid).get();
       if (snapshot.exists) {
@@ -150,7 +161,8 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
         for (var item in offers.children) {
           if (item.key != null && item.value is Map) {
             try {
-              final food = FoodItem.fromRealtimeDB(item.key!, item.value as Map, restaurantId ?? "");
+              final food = FoodItem.fromRealtimeDB(
+                  item.key!, item.value as Map, restaurantId ?? "");
               fetchedOffers.add(food);
             } catch (_) {}
           }
@@ -171,7 +183,8 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
         for (var item in picks.children) {
           if (item.key != null && item.value is Map) {
             try {
-              final food = FoodItem.fromRealtimeDB(item.key!, item.value as Map, restaurantId ?? "");
+              final food = FoodItem.fromRealtimeDB(
+                  item.key!, item.value as Map, restaurantId ?? "");
               fetchedPicks.add(food);
             } catch (_) {}
           }
@@ -188,13 +201,15 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
     return 0.0;
   }
 
+
   Future<void> loadRestaurants(double userLat, double userLon) async {
     DataSnapshot snapshot = await dbRef.get();
     List<Restaurant> tempList = [];
+
     for (DataSnapshot restaurantSnap in snapshot.children) {
-      String? id = restaurantSnap.key;
-      String? name = restaurantSnap.child("name").value as String?;
-      String? imageUrl = restaurantSnap.child("imageURL").value as String?;
+      String id = restaurantSnap.key ?? "";
+      String name = restaurantSnap.child("name").value?.toString() ?? "Unnamed";
+      String imageUrl = restaurantSnap.child("imageURL").value?.toString() ?? "";
       var latObj = restaurantSnap.child("location").child("latitude").value;
       var lonObj = restaurantSnap.child("location").child("longitude").value;
       String latStr = latObj?.toString() ?? "0";
@@ -202,31 +217,39 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
       double latitude = double.tryParse(latStr) ?? 0.0;
       double longitude = double.tryParse(lonStr) ?? 0.0;
       String addressString = await getAddressFromCoordinates(latitude, longitude);
-      Map<String, dynamic>? opHoursMap;
-      if (restaurantSnap.child("operatingHours").value != null) {
-        opHoursMap = Map<String, dynamic>.from(
-          restaurantSnap.child("operatingHours").value as Map,
-        );
+
+
+      Map<String, OperatingHours> opHoursConverted = {};
+      var opHoursVal = restaurantSnap.child("operatingHours").value;
+      if (opHoursVal is Map) {
+        Map<String, dynamic> opHoursMap = Map<String, dynamic>.from(opHoursVal);
+        opHoursConverted = opHoursMap.map((key, value) {
+          if (value is Map) {
+            return MapEntry(key, OperatingHours.fromMap(Map<String, dynamic>.from(value)));
+          }
+          return MapEntry(key, OperatingHours());
+        });
       }
-      double rating = double.tryParse(restaurantSnap.child("rating").value.toString()) ?? 4.5;
+
+      double rating = double.tryParse(restaurantSnap.child("rating").value?.toString() ?? "") ?? 4.5;
+      // Calculate distance using Euclidean distance for simplicity.
       double distanceKm = sqrt(pow(userLat - latitude, 2) + pow(userLon - longitude, 2));
       int etaMinutes = (distanceKm / 40 * 60).toInt();
 
-      if (name != null) {
-        Restaurant restaurant = Restaurant.withDetails(
-          id: id ?? "",
-          name: name,
-          address: addressString,
-          imageUrl: imageUrl ?? "",
-          location: LocationCoordinates.withCoordinates(latitude, longitude),
-          operatingHours: {},
-          rating: rating,
-          distanceKm: distanceKm,
-          etaMinutes: etaMinutes,
-        );
-        tempList.add(restaurant);
-      }
+      Restaurant restaurant = Restaurant.withDetails(
+        id: id,
+        name: name,
+        address: addressString,
+        imageUrl: imageUrl,
+        location: LocationCoordinates.withCoordinates(latitude, longitude),
+        operatingHours: opHoursConverted, // Now converted to Map<String, OperatingHours>
+        rating: rating,
+        distanceKm: distanceKm,
+        etaMinutes: etaMinutes,
+      );
+      tempList.add(restaurant);
     }
+
     setState(() {
       restaurantList = tempList;
     });
@@ -272,7 +295,7 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Custom header row
+              // Header.
               Row(
                 children: [
                   const Expanded(
@@ -353,10 +376,12 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
                   final restaurant = restaurantList[index];
                   return GestureDetector(
                     onTap: () {
+                      // Navigate to the selected restaurant's detail screen.
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RestaurantPageScreen(restaurantId: restaurant.id ?? ""),
+                          builder: (context) => RestaurantPageScreen(
+                              restaurantId: restaurant.id ?? ""),
                         ),
                       );
                     },
@@ -368,13 +393,12 @@ class _RestaurantHomeState extends State<RestaurantScreen> {
           ),
         ),
       ),
-      // Use the same bottom navigation as in CustomerHome.
       bottomNavigationBar: CustomerBottomNavigationMenu(selectedIndex: _currentIndex),
     );
   }
 }
 
-// Inline RestaurantItem widget
+// Inline RestaurantItem widget.
 class RestaurantItem extends StatelessWidget {
   final Restaurant restaurant;
 
@@ -420,10 +444,13 @@ class RestaurantItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
-            Text("$rating ⭐", style: const TextStyle(fontSize: 12)),
+            Text(
+              '$rating ⭐',
+              style: const TextStyle(fontSize: 12, color: Colors.orangeAccent),
+            ),
             const SizedBox(height: 4),
             Text(
-              "${distance.toStringAsFixed(1)} km • $eta min",
+              "${distance.toStringAsFixed(1)} km • $eta mins",
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],

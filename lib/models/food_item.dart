@@ -1,55 +1,3 @@
-// import 'package:flutter/foundation.dart';
-//
-// class FoodItem {
-//   final String id;           // UID
-//   final String description;  // Description
-//   final String imageUrl;
-//   final double price;
-//
-//   FoodItem({
-//     required this.id,
-//     required this.description,
-//     required this.imageUrl,
-//     required this.price,
-//   });
-//
-//   // 🔹 Factory constructor from Realtime DB map
-//   factory FoodItem.fromRealtimeDB(String id, Map data) {
-//     return FoodItem(
-//       id: id,
-//       description: data['description'] ?? '',
-//       imageUrl: data['imageURL'] ?? '',
-//       price: (data['price'] ?? 0).toDouble(),
-//     );
-//   }
-//
-//   // 🔹 Convert object to Map (for Firebase or storage)
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'description': description,
-//       'imageURL': imageUrl,
-//       'price': price,
-//     };
-//   }
-//
-//   // 🔹 Optional: Clone with modifications
-//   FoodItem copyWith({
-//     String? id,
-//     String? description,
-//     String? imageUrl,
-//     double? price,
-//   }) {
-//     return FoodItem(
-//       id: id ?? this.id,
-//       description: description ?? this.description,
-//       imageUrl: imageUrl ?? this.imageUrl,
-//       price: price ?? this.price,
-//     );
-//   }
-// }
-
-
-
 import 'package:flutter/foundation.dart';
 
 class FoodItem {
@@ -85,24 +33,40 @@ class FoodItem {
     price: price,
   );
 
-  /// Factory constructor from Realtime DB snapshot.
-  /// NOTE: Expects three positional arguments: id, data, and restaurantId.
+  /// Factory constructor from a Realtime DB snapshot.
+  /// Expects [id], [data] and [restaurantId].
+  /// Throws an Exception if any required field is missing.
   factory FoodItem.fromRealtimeDB(String id, Map data, String restaurantId) {
-    final description = data['description'];
-    final imageUrl = data['imageURL'];
-    final priceValue = data['price'];
-    if (id != null && description != null && imageUrl != null && priceValue != null) {
-      return FoodItem.withDetails(
-        id: id,
-        description: description,
-        imageUrl: imageUrl,
-        restaurantId: restaurantId,
-        price: (priceValue).toDouble(),
-      )
-        ..parentNode = data['parentNode'] ?? ''
-        ..category = data['category'] ?? '';
+    final dynamic description = data['description'];
+    final dynamic imageUrl = data['imageURL'];
+    final dynamic priceValue = data['price'];
+
+    if (description == null || imageUrl == null || priceValue == null) {
+      throw Exception("Invalid data snapshot for FoodItem: Missing required field(s).");
     }
-    throw Exception("Invalid data snapshot for FoodItem");
+
+    double price;
+    if (priceValue is num) {
+      price = priceValue.toDouble();
+    } else if (priceValue is String) {
+      try {
+        price = double.parse(priceValue);
+      } catch (e) {
+        throw Exception("Invalid data snapshot for FoodItem: Price format error.");
+      }
+    } else {
+      throw Exception("Invalid data snapshot for FoodItem: Unrecognized price format.");
+    }
+
+    return FoodItem.withDetails(
+      id: id,
+      description: description.toString(),
+      imageUrl: imageUrl.toString(),
+      restaurantId: restaurantId,
+      price: price,
+    )
+      ..parentNode = data['parentNode']?.toString() ?? ''
+      ..category = data['category']?.toString() ?? '';
   }
 
   // Convert object to Map (for Firebase or other storage)
@@ -135,7 +99,7 @@ class FoodItem {
     this.imageUrl = imageUrl;
   }
 
-  // Setter for price that handles both String and numeric inputs
+  /// Setter for price that handles String, int, or double.
   void setPrice(dynamic price) {
     if (price is String) {
       try {

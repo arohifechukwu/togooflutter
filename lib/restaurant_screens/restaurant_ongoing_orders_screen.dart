@@ -143,7 +143,8 @@ class _RestaurantOngoingOrdersScreenState extends State<RestaurantOngoingOrdersS
                     onPressed: status == "accepted"
                         ? () => updateOrderStatus(orderId, "preparing")
                         : null,
-                    child: const Text("Mark as Preparing"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                    child: const Text("Mark as Preparing", style: TextStyle(color: Colors.black)),
                   ),
                 const SizedBox(width: 10),
                 if (status == "accepted" || status == "preparing" || status == "ready")
@@ -151,7 +152,8 @@ class _RestaurantOngoingOrdersScreenState extends State<RestaurantOngoingOrdersS
                     onPressed: status != "ready"
                         ? () => updateOrderStatus(orderId, "ready")
                         : null,
-                    child: const Text("Ready for Pickup"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                    child: const Text("Ready for Pickup", style: TextStyle(color: Colors.black)),
                   ),
               ],
             )
@@ -164,7 +166,10 @@ class _RestaurantOngoingOrdersScreenState extends State<RestaurantOngoingOrdersS
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Ongoing Orders")),
+      appBar: AppBar(
+        title: const Text("Ongoing Orders"),
+        backgroundColor: Colors.orange, // 🟧 Set title bar background to orange
+      ),
       body: Column(
         children: [
           Padding(

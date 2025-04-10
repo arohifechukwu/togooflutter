@@ -5,70 +5,78 @@ import '../restaurant_screens/restaurant_manage_screen.dart';
 import '../restaurant_screens/restaurant_new_screen.dart';
 import '../restaurant_screens/restaurant_report_screen.dart';
 
+// ✅ Define color palette
+const Color primaryColor = Color(0xFFF18D34); // Dark Orange
+const Color darkGray = Color(0xFF757575); // Unselected label color
+
 class RestaurantBottomNavigationMenu extends StatelessWidget {
   final int currentIndex;
-  final BuildContext context;
 
   const RestaurantBottomNavigationMenu({
-    super.key,
+    Key? key,
     required this.currentIndex,
-    required this.context,
-  });
+  }) : super(key: key);
 
-  void _navigate(int index) {
-    if (index == currentIndex) return;
-    Widget destination;
-    switch (index) {
-      case 0:
-        destination = const RestaurantHomeScreen();
-        break;
-      case 1:
-        destination = const RestaurantNewScreen();
-        break;
-      case 2:
-        destination = const RestaurantReportScreen();
-        break;
-      case 3:
-        destination = const RestaurantManageScreen();
-        break;
-      case 4:
-        destination = const RestaurantAccountScreen();
-        break;
-      default:
-        return;
+  static final List<Widget> _pages = [
+    RestaurantHomeScreen(),
+    RestaurantNewScreen(),
+    RestaurantReportScreen(),
+    RestaurantManageScreen(),
+    RestaurantAccountScreen(),
+  ];
+
+  void _onItemTapped(BuildContext context, int index) {
+    if (index != currentIndex) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => _pages[index]),
+      );
     }
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => destination),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget _coloredIcon(String assetPath, bool isSelected) {
+      return ColorFiltered(
+        colorFilter: ColorFilter.mode(
+          isSelected ? primaryColor : darkGray,
+          BlendMode.srcIn,
+        ),
+        child: Image.asset(
+          assetPath,
+          width: 24,
+          height: 24,
+        ),
+      );
+    }
+
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      selectedItemColor: Colors.deepOrange,
-      unselectedItemColor: Colors.grey,
-      onTap: _navigate,
+      showUnselectedLabels: true,
+      selectedItemColor: primaryColor,
+      unselectedItemColor: darkGray,
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+      onTap: (index) => _onItemTapped(context, index),
       items: [
         BottomNavigationBarItem(
-          icon: Image.asset('assets/ic_buy.png', width: 24, height: 24),
+          icon: _coloredIcon('assets/ic_buy.png', currentIndex == 0),
           label: 'Orders',
         ),
         BottomNavigationBarItem(
-          icon: Image.asset('assets/ic_create.png', width: 24, height: 24),
+          icon: _coloredIcon('assets/ic_create.png', currentIndex == 1),
           label: 'New',
         ),
         BottomNavigationBarItem(
-          icon: Image.asset('assets/ic_report.png', width: 24, height: 24),
+          icon: _coloredIcon('assets/ic_report.png', currentIndex == 2),
           label: 'Reports',
         ),
         BottomNavigationBarItem(
-          icon: Image.asset('assets/ic_manage.png', width: 24, height: 24),
+          icon: _coloredIcon('assets/ic_manage.png', currentIndex == 3),
           label: 'Manage',
         ),
         BottomNavigationBarItem(
-          icon: Image.asset('assets/ic_setting.png', width: 24, height: 24),
+          icon: _coloredIcon('assets/ic_setting.png', currentIndex == 4),
           label: 'Account',
         ),
       ],

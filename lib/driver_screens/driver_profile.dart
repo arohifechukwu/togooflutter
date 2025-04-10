@@ -26,6 +26,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     super.initState();
     currentUser = FirebaseAuth.instance.currentUser!;
     driverRef = FirebaseDatabase.instance.ref("driver").child(currentUser.uid);
+
     nameController = TextEditingController();
     addressController = TextEditingController();
     phoneController = TextEditingController();
@@ -33,6 +34,10 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     carBrandController = TextEditingController();
     carModelController = TextEditingController();
     licensePlateController = TextEditingController();
+
+    profileImageURL = '';
+    carImageURL = '';
+
     loadDriverData();
   }
 
@@ -138,7 +143,8 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Driver Profile'),
+        title: const Text("Driver Profile",),
+        backgroundColor: const Color(0xFFE37D2B),
         actions: [
           IconButton(
             icon: Icon(Icons.save),
@@ -161,11 +167,6 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                     ? Icon(Icons.camera_alt, size: 40, color: Colors.white)
                     : null,
               ),
-            ),
-            SizedBox(height: 16),
-            TextButton(
-              onPressed: () => selectImage(true),
-              child: Text('Change Profile Picture'),
             ),
             TextFormField(
               controller: nameController,
@@ -200,21 +201,29 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
             GestureDetector(
               onTap: () => selectImage(false),
               child: Image.asset(
-                'assets/ic_car_placeholder.jpg', // You can set a default image or add a placeholder
+                'assets/ic_car_placeholder.jpg',
                 height: 150,
                 width: 150,
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 16),
-            TextButton(
-              onPressed: () => selectImage(false),
-              child: Text('Change Car Picture'),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: saveProfileData,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFE37D2B),
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text(
+                'Save Changes',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+              ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: DriverBottomNavigationMenu(currentIndex: 3, context: context),
+      bottomNavigationBar: DriverBottomNavigationMenu(currentIndex: 3),
     );
   }
 }

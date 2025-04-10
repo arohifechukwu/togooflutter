@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_bottom_navigation_menu.dart';
 import 'login_screen.dart';
+import 'profile_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -77,16 +78,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           /// ✅ Profile
           _buildSettingOption(
             title: "Profile",
-            iconPath: "assets/icons/ic_profile.png",
+            iconPath: "assets/ic_profile.png",
             onTap: () {
-              // TODO: Navigate to profile screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
             },
           ),
 
           /// ✅ Notifications
           _buildSettingOption(
             title: "Notifications",
-            iconPath: "assets/icons/ic_notifications.png",
+            iconPath: "assets/ic_notifications.png",
             onTap: () {
               // TODO: Navigate to notifications settings
             },
@@ -95,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           /// ✅ About Us
           _buildSettingOption(
             title: "About Us",
-            iconPath: "assets/icons/ic_info.png",
+            iconPath: "assets/ic_info.png",
             onTap: () {
               // TODO: Navigate to About Us screen
             },
@@ -104,7 +108,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           /// ✅ FAQ
           _buildSettingOption(
             title: "FAQ",
-            iconPath: "assets/icons/ic_faq.png",
+            iconPath: "assets/ic_faq.png",
             onTap: () {
               // TODO: Navigate to FAQ screen
             },
@@ -113,7 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           /// ✅ Language
           _buildSettingOption(
             title: "Language",
-            iconPath: "assets/icons/ic_language.png",
+            iconPath: "assets/ic_language.png",
             onTap: () {
               // TODO: Navigate to Language selection screen
             },
@@ -122,7 +126,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           /// ✅ Dark Mode Toggle
           _buildSettingOption(
             title: "Dark Mode",
-            iconPath: "assets/icons/ic_dark_mode.png",
+            iconPath: "assets/ic_dark_mode.png",
             trailing: Switch(
               value: _isDarkMode,
               onChanged: (value) => _toggleTheme(value),
@@ -132,7 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           /// ✅ Logout
           _buildSettingOption(
             title: "Logout",
-            iconPath: "assets/icons/ic_logout.png",
+            iconPath: "assets/ic_logout.png",
             onTap: _logoutUser,
           ),
 

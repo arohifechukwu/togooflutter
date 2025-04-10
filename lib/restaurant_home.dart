@@ -1,14 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:togoo/restaurant_bottom_navigation_menu.dart';
 import '../widgets/order_tile.dart';
 import '../restaurant_screens/restaurant_ongoing_orders_screen.dart';
-import '../restaurant_screens/restaurant_new_screen.dart';
-import '../restaurant_screens/restaurant_report_screen.dart';
-import '../restaurant_screens/restaurant_manage_screen.dart';
-import '../restaurant_screens/restaurant_account_screen.dart'; // Import your custom bottom navigation
 
 class RestaurantHomeScreen extends StatefulWidget {
   const RestaurantHomeScreen({Key? key}) : super(key: key);
@@ -29,23 +24,32 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
     listenToOrders();
   }
 
+
   void listenToOrders() {
     DatabaseReference ref = FirebaseDatabase.instance.ref("ordersByRestaurant").child(restaurantId);
-
-    ref.onValue.listen((DatabaseEvent event) {
+    ref.onValue.listen((DatabaseEvent event) async {
       final snapshot = event.snapshot;
       if (!snapshot.exists) {
-        setState(() {
-          orderIds = [];
-        });
+        setState(() => orderIds = []);
         return;
       }
+
       Map<dynamic, dynamic>? ordersMap = snapshot.value as Map<dynamic, dynamic>?;
       if (ordersMap != null) {
-        List<String> ids = ordersMap.keys.map((e) => e.toString()).toList();
-        setState(() {
-          orderIds = ids;
-        });
+        List<String> filteredIds = [];
+
+        for (var key in ordersMap.keys) {
+          final orderSnapshot = await ordersRef.child(key.toString()).get();
+          if (orderSnapshot.exists) {
+            final data = orderSnapshot.value as Map<Object?, Object?>;
+            final status = (data["status"] ?? "").toString().toLowerCase();
+            if (status == "placed") {
+              filteredIds.add(key.toString());
+            }
+          }
+        }
+
+        setState(() => orderIds = filteredIds);
       }
     });
   }
@@ -55,7 +59,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Orders"),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.orange,
         automaticallyImplyLeading: false,
       ),
       body: Padding(
@@ -100,7 +104,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                 itemBuilder: (context, index) {
                   String orderId = orderIds[index];
                   return FutureBuilder<DataSnapshot>(
-                    future: FirebaseDatabase.instance.ref("orders").child(orderId).get(),
+                    future: ordersRef.child(orderId).get(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState != ConnectionState.done) {
                         return const Padding(
@@ -111,15 +115,20 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
                       if (!snapshot.hasData || !snapshot.data!.exists) {
                         return const ListTile(title: Text("Order data not found."));
                       }
-
                       final rawData = snapshot.data!.value as Map<Object?, Object?>;
                       final orderDataMap = <String, dynamic>{};
                       rawData.forEach((key, value) {
                         orderDataMap[key.toString()] = value;
                       });
                       orderDataMap["orderId"] = orderId;
-
-                      return OrderTile(orderData: orderDataMap); // Pass the data to OrderTile
+                      // Only display orders with status "placed".
+                      final orderStatus =
+                      (orderDataMap["status"] ?? "").toString().toLowerCase();
+                      if (orderStatus != "placed") {
+                        return const SizedBox.shrink();
+                      }
+                      // For restaurant view, pass isCustomerView: false.
+                      return OrderTile(orderData: orderDataMap, isCustomerView: false);
                     },
                   );
                 },
@@ -129,8 +138,7 @@ class _RestaurantHomeScreenState extends State<RestaurantHomeScreen> {
         ),
       ),
       bottomNavigationBar: RestaurantBottomNavigationMenu(
-        currentIndex: 0,  // Set this to the current index for the navigation
-        context: context, // Pass the context to the bottom navigation menu
+        currentIndex: 0
       ),
     );
   }

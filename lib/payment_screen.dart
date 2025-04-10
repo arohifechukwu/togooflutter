@@ -295,17 +295,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Credit Card Payment Button
             ElevatedButton(
               onPressed: _presentPaymentSheet,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: const Text(
                 "Credit Card Payment",
@@ -313,10 +312,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            // Pick Up Order Button
             ElevatedButton(
               onPressed: () {
-                // For pick-up, we can directly store the order with a specific status.
                 _storeOrderToFirebase("pickup", "pickup").then((_) {
                   Navigator.pushReplacement(
                     context,
@@ -326,7 +323,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueGrey,
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: const Text(
                 "Pick Up Order",

@@ -132,7 +132,7 @@ class _AccountScreenState extends State<AccountScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomerBottomNavigationMenu(selectedIndex: 4),
+      bottomNavigationBar: CustomerBottomNavigationMenu(selectedIndex: 3),
     );
   }
 }

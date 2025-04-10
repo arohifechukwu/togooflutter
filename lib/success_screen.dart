@@ -56,7 +56,7 @@ class SuccessScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor, // Use your primary color
+                  backgroundColor: Colors.orange, // Use your primary color
                   padding: EdgeInsets.all(12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

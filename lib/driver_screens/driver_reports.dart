@@ -16,7 +16,7 @@ class DriverReportsScreen extends StatelessWidget {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      bottomNavigationBar: DriverBottomNavigationMenu(currentIndex: 2, context: context), // Adjust index based on the desired position in the navigation
+      bottomNavigationBar: DriverBottomNavigationMenu(currentIndex: 2), // Adjust index based on the desired position in the navigation
     );
   }
 }

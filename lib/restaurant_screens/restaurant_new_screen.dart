@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,10 +85,10 @@ class _RestaurantNewScreenState extends State<RestaurantNewScreen> {
 
     final foodData = {
       "id": foodId,
-      "foodDescription": desc,
-      "foodImage": imageUrl,
+      "description": desc,
+      "imageURL": imageUrl,
       "restaurantId": uid,
-      "foodPrice": price
+      "price": price
     };
 
     DatabaseReference dbRef;
@@ -121,7 +120,10 @@ class _RestaurantNewScreenState extends State<RestaurantNewScreen> {
     final showDropdown = _selectedSection == "Update Menu Category";
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Food Item")),
+      appBar: AppBar(
+        title: const Text("Create Food Item"),
+        backgroundColor: Colors.orange, // 🟧 AppBar color
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -192,14 +194,23 @@ class _RestaurantNewScreenState extends State<RestaurantNewScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _uploadImageAndSaveFood,
-              child: const Text("Create Food Item", style: TextStyle(color: Colors.black)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                "Create Food Item",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
       ),
       bottomNavigationBar: RestaurantBottomNavigationMenu(
-        currentIndex: 1,  // Set this to the current index for the navigation
-        context: context, // Pass the context to the bottom navigation menu
+        currentIndex: 1,
       ),
     );
   }

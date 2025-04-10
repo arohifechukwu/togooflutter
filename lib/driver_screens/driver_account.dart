@@ -15,7 +15,7 @@ class DriverAccountScreen extends StatefulWidget {
 }
 
 class _DriverAccountScreenState extends State<DriverAccountScreen> {
-  late Switch themeSwitch, availabilitySwitch;
+  bool isAvailable = false;
   late DatabaseReference driverRef;
   late SharedPreferences sharedPreferences;
   bool isDarkMode = false;
@@ -40,17 +40,13 @@ class _DriverAccountScreenState extends State<DriverAccountScreen> {
     driverRef = FirebaseDatabase.instance.ref("driver").child(driverId);
 
     driverRef.once().then((DatabaseEvent snapshot) {
-      if (snapshot.snapshot.value != null) { // Check if data exists
+      if (snapshot.snapshot.exists) {
         String availability = snapshot.snapshot.child("availability").value.toString();
         setState(() {
-          availabilitySwitch = Switch(
-            value: availability == "available",
-            onChanged: (value) => _updateAvailability(value),
-          );
+          isAvailable = availability == "available";
         });
       }
     }).catchError((error) {
-      // Handle any errors here
       print('Error loading driver data: $error');
     });
   }
@@ -91,7 +87,8 @@ class _DriverAccountScreenState extends State<DriverAccountScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Driver Account'),
+        title: const Text("Driver Notifications",),
+        backgroundColor: const Color(0xFFE37D2B),
       ),
       body: Column(
         children: [
@@ -161,8 +158,13 @@ class _DriverAccountScreenState extends State<DriverAccountScreen> {
               leading: Image.asset('assets/ic_available.png', width: 40, height: 40),
               title: Text('Availability'),
               trailing: Switch(
-                value: availabilitySwitch.value,
-                onChanged: _updateAvailability,
+                value: isAvailable,
+                onChanged: (value) {
+                  setState(() => isAvailable = value);
+                  _updateAvailability(value);
+                },
+                activeColor: Colors.white,
+                activeTrackColor: const Color(0xFFE37D2B),
               ),
             ),
           ),
@@ -175,7 +177,7 @@ class _DriverAccountScreenState extends State<DriverAccountScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: DriverBottomNavigationMenu(currentIndex: 3, context: context),
+      bottomNavigationBar: DriverBottomNavigationMenu(currentIndex: 3),
     );
   }
 }

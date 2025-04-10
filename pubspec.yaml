@@ -129,13 +129,15 @@ flutter:
     - assets/ic_setting.png
     - assets/ic_available.png
     - assets/ic_profile.png
-    - assets/ic_notifications.png
+    - assets/ic_notifications_active.png
     - assets/ic_info.png
     - assets/ic_faq.png
     - assets/ic_dark_mode.png
     - assets/ic_language.png
     - assets/ic_logout.png
     - assets/ic_car_placeholder.jpg
+    - assets/ic_notification_active.png
+    - assets/ic_food_placeholder.jpeg
 
 
 

@@ -6,6 +6,7 @@ import 'restaurant_profile_screen.dart';
 import 'restaurant_new_screen.dart';
 import 'restaurant_report_screen.dart';
 import 'restaurant_manage_screen.dart';
+import 'package:togoo/restaurant_bottom_navigation_menu.dart';
 
 class RestaurantAccountScreen extends StatefulWidget {
   const RestaurantAccountScreen({super.key});
@@ -31,7 +32,8 @@ class _RestaurantAccountScreenState extends State<RestaurantAccountScreen> {
   Future<void> _toggleTheme(bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool("darkMode", value);
-    SchedulerBinding.instance.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    SchedulerBinding.instance.handleAppLifecycleStateChanged(
+        AppLifecycleState.inactive);
     setState(() => isDarkMode = value);
   }
 
@@ -42,12 +44,13 @@ class _RestaurantAccountScreenState extends State<RestaurantAccountScreen> {
     Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
   }
 
-  Widget _buildSettingCard(IconData icon, String label, VoidCallback onTap) {
+  Widget _buildSettingCard(String iconPath, String label, VoidCallback onTap) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        leading: Icon(icon, size: 28),
+        leading: Image.asset(iconPath, width: 28, height: 28),
         title: Text(label, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,
@@ -67,51 +70,30 @@ class _RestaurantAccountScreenState extends State<RestaurantAccountScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildSettingCard(Icons.person, "Profile", () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RestaurantProfileScreen()))),
-          _buildSettingCard(Icons.notifications, "Notifications", () {}),
-          _buildSettingCard(Icons.info, "About Us", () {}),
-          _buildSettingCard(Icons.question_answer, "FAQ", () {}),
-          _buildSettingCard(Icons.language, "Language", () {}),
-          SwitchListTile(
-            contentPadding: const EdgeInsets.all(16),
-            title: const Text("Dark Mode", style: TextStyle(fontSize: 16)),
-            secondary: const Icon(Icons.dark_mode),
-            value: isDarkMode,
-            onChanged: _toggleTheme,
+          _buildSettingCard("assets/ic_profile.png", "Profile", () =>
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => const RestaurantProfileScreen()))),
+          _buildSettingCard("assets/ic_notifications.png", "Notifications", () {}),
+          _buildSettingCard("assets/ic_info.png", "About Us", () {}),
+          _buildSettingCard("assets/ic_faq.png", "FAQ", () {}),
+          _buildSettingCard("assets/ic_language.png", "Language", () {}),
+          Card(
+            elevation: 2,
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: SwitchListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              title: const Text("Dark Mode", style: TextStyle(fontSize: 16)),
+              secondary: Image.asset("assets/ic_dark_mode.png", width: 28, height: 28),
+              value: isDarkMode,
+              onChanged: _toggleTheme,
+            ),
           ),
-          _buildSettingCard(Icons.logout, "Logout", _logout),
+          _buildSettingCard("assets/ic_logout.png", "Logout", _logout),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 4,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.deepOrange,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RestaurantHomeScreen()));
-              break;
-            case 1:
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RestaurantNewScreen()));
-              break;
-            case 2:
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RestaurantReportScreen()));
-              break;
-            case 3:
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const RestaurantManageScreen()));
-              break;
-            case 4:
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Orders'),
-          BottomNavigationBarItem(icon: Icon(Icons.create), label: 'New'),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Reports'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_applications), label: 'Manage'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-        ],
+      bottomNavigationBar: RestaurantBottomNavigationMenu(
+          currentIndex: 4
       ),
     );
   }

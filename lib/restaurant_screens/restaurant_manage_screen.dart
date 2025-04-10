@@ -3,12 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../edit_food_item.dart';
+import '../edit_food_item.dart'; // Make sure this file exists for editing food items
 import 'restaurant_new_screen.dart';
 import 'restaurant_report_screen.dart';
 import '../restaurant_home.dart';
 import 'restaurant_account_screen.dart';
 import '../restaurant_bottom_navigation_menu.dart';
+import 'package:togoo/models/food_item.dart'; // Ensure your FoodItem model is defined
 
 class RestaurantManageScreen extends StatefulWidget {
   const RestaurantManageScreen({Key? key}) : super(key: key);
@@ -37,16 +38,19 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
     });
   }
 
+  // Fetch both section items and menu items.
   void fetchAllSections() {
     fetchSection("Special Offers");
     fetchSection("Top Picks");
     fetchMenuItems();
   }
 
+  // Fetch a specific section from restaurant node.
   void fetchSection(String section) {
     _dbRef.child("restaurant").child(restaurantUID).child(section).onValue.listen((event) {
       final data = event.snapshot.value as Map?;
       if (data != null) {
+        // Map each entry to a food item and add section information.
         final items = data.entries.map((entry) {
           final item = Map<String, dynamic>.from(entry.value);
           item['id'] = entry.key;
@@ -55,6 +59,7 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
         }).toList();
 
         setState(() {
+          // Remove any existing items in this section
           allItems.removeWhere((e) => e['section'] == section);
           allItems.addAll(items);
           filterItems();
@@ -63,6 +68,7 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
     });
   }
 
+  // Fetch all food items from the "menu" node.
   void fetchMenuItems() {
     _dbRef.child("restaurant").child(restaurantUID).child("menu").onValue.listen((event) {
       final data = event.snapshot.value as Map?;
@@ -87,6 +93,7 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
     });
   }
 
+  // Filter food items based on the search query.
   void filterItems() {
     if (searchQuery.isEmpty) {
       filteredItems = List.from(allItems);
@@ -95,11 +102,14 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
         final id = item['id'].toString().toLowerCase();
         final section = item['section'].toString().toLowerCase();
         final category = item['category']?.toString().toLowerCase() ?? "";
-        return id.contains(searchQuery) || section.contains(searchQuery) || category.contains(searchQuery);
+        return id.contains(searchQuery) ||
+            section.contains(searchQuery) ||
+            category.contains(searchQuery);
       }).toList();
     }
   }
 
+  // Delete a food item from Firebase Realtime Database and its image from Storage.
   void deleteItem(Map<String, dynamic> item) async {
     final section = item['section'];
     final id = item['id'];
@@ -120,12 +130,12 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
         final storageRef = FirebaseStorage.instance.refFromURL(imageURL);
         await storageRef.delete();
       } catch (e) {
-        // ignore
+        // Could not delete the image; optionally log or notify.
       }
     }
   }
 
-  // Navigate to the EditFoodItemScreen with food item data
+  // Navigate to the edit screen with current food item data.
   void _navigateToEditFoodItem(Map<String, dynamic> item) {
     Navigator.push(
       context,
@@ -144,6 +154,7 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
     );
   }
 
+  // Build a card widget for the given food item.
   Widget buildFoodCard(Map<String, dynamic> item) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -176,7 +187,7 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => _navigateToEditFoodItem(item), // Navigate to EditFoodItemScreen
+              onPressed: () => _navigateToEditFoodItem(item),
             ),
           ],
         ),
@@ -189,6 +200,7 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage Food Items"),
+        backgroundColor: Colors.orange,
       ),
       body: Column(
         children: [
@@ -218,9 +230,10 @@ class _RestaurantManageScreenState extends State<RestaurantManageScreen> {
         ],
       ),
       bottomNavigationBar: RestaurantBottomNavigationMenu(
-        currentIndex: 3,  // This ensures the 'Manage' tab is selected
-        context: context, // Pass the context to the bottom navigation menu
+        currentIndex: 3
       ),
     );
   }
 }
+
+

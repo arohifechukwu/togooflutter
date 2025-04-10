@@ -1,4 +1,3 @@
-// Flutter version of RestaurantProfileActivity
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -112,74 +111,75 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const Text("Restaurant's Profile", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
+      appBar: AppBar(
+        backgroundColor: Colors.orange,
+        title: const Text("Restaurant's Profile", style: TextStyle(color: Colors.white)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 60,
+              backgroundImage: _selectedImage != null
+                  ? FileImage(_selectedImage!)
+                  : (_imageURL != null ? NetworkImage(_imageURL!) as ImageProvider : null),
+              child: _imageURL == null && _selectedImage == null
+                  ? const Icon(Icons.image, size: 60)
+                  : null,
+            ),
+            TextButton(
+              onPressed: _chooseImage,
+              child: const Text("Change Image"),
+            ),
+            TextField(controller: _nameController, decoration: const InputDecoration(labelText: "Restaurant Name")),
+            TextField(controller: _addressController, decoration: const InputDecoration(labelText: "Address")),
+            TextField(controller: _phoneController, decoration: const InputDecoration(labelText: "Phone")),
+            TextField(controller: _emailController, readOnly: true, decoration: const InputDecoration(labelText: "Email")),
+            const SizedBox(height: 24),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text("Operating Hours", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 8),
+            ..._days.map((day) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(day, style: const TextStyle(fontWeight: FontWeight.w600)),
+                Row(
+                  children: [
+                    Expanded(
+                        child: TextField(
+                          controller: _openControllers[day],
+                          decoration: const InputDecoration(hintText: "Open (e.g. 09:00)"),
+                        )),
+                    const SizedBox(width: 16),
+                    Expanded(
+                        child: TextField(
+                          controller: _closeControllers[day],
+                          decoration: const InputDecoration(hintText: "Close (e.g. 18:00)"),
+                        )),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
+            )),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _saveProfile,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              const SizedBox(height: 16),
-              CircleAvatar(
-                radius: 60,
-                backgroundImage: _selectedImage != null
-                    ? FileImage(_selectedImage!)
-                    : (_imageURL != null ? NetworkImage(_imageURL!) as ImageProvider : null),
-                child: _imageURL == null && _selectedImage == null
-                    ? const Icon(Icons.image, size: 60)
-                    : null,
-              ),
-              TextButton(
-                onPressed: _chooseImage,
-                child: const Text("Change Image"),
-              ),
-              TextField(controller: _nameController, decoration: const InputDecoration(labelText: "Restaurant Name")),
-              TextField(controller: _addressController, decoration: const InputDecoration(labelText: "Address")),
-              TextField(controller: _phoneController, decoration: const InputDecoration(labelText: "Phone")),
-              TextField(controller: _emailController, readOnly: true, decoration: const InputDecoration(labelText: "Email")),
-              const SizedBox(height: 24),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text("Operating Hours", style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 8),
-              ..._days.map((day) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(day, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: TextField(
-                            controller: _openControllers[day],
-                            decoration: const InputDecoration(hintText: "Open (e.g. 09:00)"),
-                          )),
-                      const SizedBox(width: 16),
-                      Expanded(
-                          child: TextField(
-                            controller: _closeControllers[day],
-                            decoration: const InputDecoration(hintText: "Close (e.g. 18:00)"),
-                          )),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              )),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _saveProfile,
-                child: const Text("Save Changes"),
-              ),
-            ],
-          ),
+              child: const Text("Save Changes", style: TextStyle(color: Colors.white)),
+            ),
+          ],
         ),
       ),
     );

@@ -1,225 +1,8 @@
-// import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_database/firebase_database.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';  // Import google_maps_flutter
-// import 'package:intl/intl.dart';
-// import 'package:location/location.dart';
-// import 'package:togoo/driver_home.dart';
-//
-// class DriverDeliveryScreen extends StatefulWidget {
-//   final String orderId;
-//   const DriverDeliveryScreen({Key? key, required this.orderId}) : super(key: key);
-//
-//   @override
-//   _DriverDeliveryScreenState createState() => _DriverDeliveryScreenState();
-// }
-//
-// class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
-//   late GoogleMapController mapController;
-//   late LatLng driverLatLng;
-//   late LatLng restaurantLatLng;
-//   late LatLng customerLatLng;
-//
-//   String driverAddress = '';
-//   String restaurantAddress = '';
-//   String customerAddress = '';
-//   String orderId = '';
-//   late DatabaseReference ordersRef;
-//   late DatabaseReference driversRef;
-//
-//   bool isTripStarted = false;
-//   Set<Marker> _markers = {};  // Set for holding markers
-//   Set<Polyline> _polylines = {};  // Set for holding polylines
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     orderId = widget.orderId;
-//     ordersRef = FirebaseDatabase.instance.ref('orders');
-//     driversRef = FirebaseDatabase.instance.ref('driver');
-//     _fetchAddressesAndInitializeMap();
-//   }
-//
-//   // Fetch address details from Firebase and initialize the map.
-//   void _fetchAddressesAndInitializeMap() {
-//     driversRef.child(FirebaseAuth.instance.currentUser!.uid).get().then((snapshot) {
-//       if (snapshot.exists) {
-//         driverAddress = snapshot.child("address").value.toString();
-//         ordersRef.child(orderId).get().then((orderSnapshot) {
-//           if (orderSnapshot.exists) {
-//             restaurantAddress = orderSnapshot.child("restaurant/address").value.toString();
-//             customerAddress = orderSnapshot.child("customer/address").value.toString();
-//             if (driverAddress.isNotEmpty && restaurantAddress.isNotEmpty && customerAddress.isNotEmpty) {
-//               _initializeMap();
-//             } else {
-//               _showErrorMessage("Address is missing");
-//             }
-//           }
-//         });
-//       }
-//     });
-//   }
-//
-//   // Initialize the map and add markers for the driver, restaurant, and customer.
-//   void _initializeMap() {
-//     Location().getLocation().then((locationData) {
-//       driverLatLng = LatLng(locationData.latitude!, locationData.longitude!);
-//       restaurantLatLng = _getLatLngFromAddress(restaurantAddress);
-//       customerLatLng = _getLatLngFromAddress(customerAddress);
-//
-//       setState(() {
-//         // Add markers for driver, restaurant, and customer
-//         _markers.add(Marker(
-//           markerId: MarkerId("driver"),
-//           position: driverLatLng,
-//           infoWindow: InfoWindow(title: "Driver"),
-//         ));
-//         _markers.add(Marker(
-//           markerId: MarkerId("restaurant"),
-//           position: restaurantLatLng,
-//           infoWindow: InfoWindow(title: "Restaurant"),
-//         ));
-//         _markers.add(Marker(
-//           markerId: MarkerId("customer"),
-//           position: customerLatLng,
-//           infoWindow: InfoWindow(title: "Customer"),
-//         ));
-//       });
-//
-//       // Update camera to show all markers
-//       _updateCameraPosition();
-//     });
-//   }
-//
-//   // Get LatLng from address
-//   LatLng _getLatLngFromAddress(String address) {
-//     // Implement a function to geocode address to LatLng
-//     return LatLng(0, 0); // Placeholder
-//   }
-//
-//   // Update the camera to fit all markers
-//   void _updateCameraPosition() {
-//     LatLngBounds bounds = _getLatLngBounds();
-//     mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 100));
-//   }
-//
-//   // Get bounds for the markers to fit in camera
-//   LatLngBounds _getLatLngBounds() {
-//     double minLat = driverLatLng.latitude;
-//     double minLng = driverLatLng.longitude;
-//     double maxLat = driverLatLng.latitude;
-//     double maxLng = driverLatLng.longitude;
-//
-//     // Get the bounds from the three markers
-//     List<LatLng> positions = [driverLatLng, restaurantLatLng, customerLatLng];
-//     for (var position in positions) {
-//       if (position.latitude < minLat) minLat = position.latitude;
-//       if (position.latitude > maxLat) maxLat = position.latitude;
-//       if (position.longitude < minLng) minLng = position.longitude;
-//       if (position.longitude > maxLng) maxLng = position.longitude;
-//     }
-//
-//     return LatLngBounds(
-//       southwest: LatLng(minLat, minLng),
-//       northeast: LatLng(maxLat, maxLng),
-//     );
-//   }
-//
-//   // Start the trip
-//   void _startTrip() {
-//     setState(() {
-//       isTripStarted = true;
-//     });
-//     _drawRoute();
-//   }
-//
-//   // Mark as arrived at customer
-//   void _markArrived() {
-//     String now = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now());
-//     ordersRef.child(orderId).update({
-//       'status': 'delivered',
-//       'timestamps/arrived': now,
-//     }).then((_) {
-//       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DriverHomeScreen()));
-//     });
-//   }
-//
-//   // Draw the route between driver, restaurant, and customer
-//   void _drawRoute() {
-//     if (driverLatLng == null || restaurantLatLng == null || customerLatLng == null) {
-//       return;
-//     }
-//
-//     // Clear existing polylines
-//     _polylines.clear();
-//
-//     // Add route polyline
-//     _polylines.add(Polyline(
-//       polylineId: PolylineId("route"),
-//       points: [driverLatLng, restaurantLatLng, customerLatLng],
-//       width: 10,
-//       color: Colors.blue,
-//     ));
-//
-//     setState(() {});
-//   }
-//
-//   // Display an error message in case of missing address or any issue
-//   void _showErrorMessage(String message) {
-//     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Driver Delivery'),
-//       ),
-//       body: Column(
-//         children: [
-//           Expanded(
-//             child: GoogleMap(
-//               onMapCreated: (controller) {
-//                 mapController = controller;
-//               },
-//               initialCameraPosition: CameraPosition(
-//                 target: driverLatLng,
-//                 zoom: 12,
-//               ),
-//               markers: _markers,
-//               polylines: _polylines,
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(16),
-//             child: Column(
-//               children: [
-//                 ElevatedButton(
-//                   onPressed: _startTrip,
-//                   child: Text('Start Trip'),
-//                 ),
-//                 SizedBox(height: 16),
-//                 ElevatedButton(
-//                   onPressed: _markArrived,
-//                   child: Text('Mark as Arrived'),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-// Alias the location package to avoid name conflicts:
 import 'package:location/location.dart' as loc;
 import 'package:geocoding/geocoding.dart';
 import 'package:togoo/driver_home.dart';
@@ -278,9 +61,7 @@ class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
     });
   }
 
-  // Marked as async to await asynchronous operations.
   void _initializeMap() async {
-    // Use the aliased loc.Location() to get the current location.
     loc.LocationData locationData = await loc.Location().getLocation();
     driverLatLng = LatLng(locationData.latitude!, locationData.longitude!);
     restaurantLatLng = await _getLatLngFromAddress(restaurantAddress);
@@ -289,24 +70,26 @@ class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
     setState(() {
       _isMapInitialized = true;
       _markers.add(Marker(
-        markerId: MarkerId("driver"),
+        markerId: const MarkerId("driver"),
         position: driverLatLng,
-        infoWindow: InfoWindow(title: "Driver"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        infoWindow: const InfoWindow(title: "Driver (Start)"),
       ));
       _markers.add(Marker(
-        markerId: MarkerId("restaurant"),
+        markerId: const MarkerId("restaurant"),
         position: restaurantLatLng,
-        infoWindow: InfoWindow(title: "Restaurant"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        infoWindow: const InfoWindow(title: "Restaurant (First Stop)"),
       ));
       _markers.add(Marker(
-        markerId: MarkerId("customer"),
+        markerId: const MarkerId("customer"),
         position: customerLatLng,
-        infoWindow: InfoWindow(title: "Customer"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        infoWindow: const InfoWindow(title: "Customer (Last Stop)"),
       ));
     });
   }
 
-  // Updated to return a Future and marked as async.
   Future<LatLng> _getLatLngFromAddress(String address) async {
     try {
       List<Location> locations = await locationFromAddress(address);
@@ -345,21 +128,46 @@ class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
     );
   }
 
-  void _startTrip() {
+  void _startTrip() async {
     setState(() {
       isTripStarted = true;
     });
+
+    String now = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
+
+    await ordersRef.child(orderId).update({
+      'status': 'out for delivery',
+      'timestamps/driverAssigned': now,
+    });
+
+    await ordersRef.child(orderId).child('updateLogs').push().set({
+      'timestamp': now,
+      'status': 'out for delivery',
+      'note': 'Status updated to out for delivery by driver',
+    });
+
     _drawRoute();
   }
 
-  void _markArrived() {
-    String now = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now());
-    ordersRef.child(orderId).update({
+  void _markArrived() async {
+    String now = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
+
+    await ordersRef.child(orderId).update({
       'status': 'delivered',
-      'timestamps/arrived': now,
-    }).then((_) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DriverHomeScreen()));
+      'timestamps/delivered': now,
     });
+
+    await ordersRef.child(orderId).child('updateLogs').push().set({
+      'timestamp': now,
+      'status': 'delivered',
+      'note': 'Status updated to delivered by driver',
+    });
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const DriverHomeScreen()),
+    );
   }
 
   void _drawRoute() {
@@ -368,7 +176,7 @@ class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
     }
     _polylines.clear();
     _polylines.add(Polyline(
-      polylineId: PolylineId("route"),
+      polylineId: const PolylineId("route"),
       points: [driverLatLng, restaurantLatLng, customerLatLng],
       width: 10,
       color: Colors.blue,
@@ -384,7 +192,8 @@ class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Driver Delivery'),
+        title: const Text("Driver Delivery",),
+        backgroundColor: const Color(0xFFE37D2B),
       ),
       body: _isMapInitialized
           ? Column(
@@ -395,7 +204,7 @@ class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
                 mapController = controller;
                 _updateCameraPosition();
               },
-              initialCameraPosition: CameraPosition(
+              initialCameraPosition: const CameraPosition(
                 target: LatLng(0, 0),
                 zoom: 12,
               ),
@@ -407,21 +216,34 @@ class _DriverDeliveryScreenState extends State<DriverDeliveryScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                ElevatedButton(
-                  onPressed: _startTrip,
-                  child: Text('Start Trip'),
+                Visibility(
+                  visible: !isTripStarted,
+                  child: ElevatedButton(
+                    onPressed: _startTrip,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text('Start Trip', style: TextStyle(color: Colors.black)),
+                  ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _markArrived,
-                  child: Text('Mark as Arrived'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('Mark as Arrived', style: TextStyle(color: Colors.black)),
                 ),
               ],
             ),
           ),
         ],
       )
-          : Center(child: CircularProgressIndicator()),
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -61,19 +61,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     imageUrl = data["imageURL"] ?? null;
   }
 
-  // Future<void> _selectImage() async {
-  //   debugPrint("📸 Image picker triggered");
-  //
-  //   final picker = ImagePicker();
-  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-  //
-  //   if (pickedFile != null) {
-  //     debugPrint("✅ Image picked: ${pickedFile.path}");
-  //     setState(() => _imageFile = File(pickedFile.path));
-  //   } else {
-  //     debugPrint("❌ No image selected");
-  //   }
-  // }
 
   Future<void> _selectImage() async {
     final status = await Permission.photos.request(); // For Android 13+

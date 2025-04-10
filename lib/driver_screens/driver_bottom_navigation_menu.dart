@@ -1,84 +1,75 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import '../driver_home.dart'; //
 import '../driver_screens/driver_orders.dart'; //
 import '../driver_screens/driver_reports.dart'; //
 import '../driver_screens/driver_account.dart'; //
 
+// ✅ Define color palette
+const Color primaryColor = Color(0xFFF18D34); // Dark Orange
+const Color darkGray = Color(0xFF757575); // Unselected label color
+
 class DriverBottomNavigationMenu extends StatelessWidget {
   final int currentIndex;
-  final BuildContext context;
 
-  const DriverBottomNavigationMenu({
-    super.key,
-    required this.currentIndex,
-    required this.context,
-  });
+  const DriverBottomNavigationMenu({required this.currentIndex, Key? key})
+      : super(key: key);
 
-  void _navigate(int index) {
-    if (index == currentIndex) return;
-    Widget destination;
-    switch (index) {
-      case 0:
-        destination = const DriverHomeScreen();
-        break;
-      case 1:
-        destination = const DriverOrdersScreen();
-        break;
-      case 2:
-        destination = const DriverReportsScreen();
-        break;
-      case 3:
-        destination = const DriverAccountScreen();
-        break;
-      default:
-        return;
+  static final List<Widget> _pages = [
+    DriverHomeScreen(),
+    DriverOrdersScreen(),
+    DriverReportsScreen(),
+    DriverAccountScreen(),
+  ];
+
+  void _onItemTapped(BuildContext context, int index) {
+    if (index != currentIndex) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => _pages[index]),
+      );
     }
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => destination),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget _coloredIcon(String assetPath, bool isSelected) {
+      return ColorFiltered(
+        colorFilter: ColorFilter.mode(
+          isSelected ? primaryColor : darkGray,
+          BlendMode.srcIn,
+        ),
+        child: Image.asset(
+          assetPath,
+          width: 24,
+          height: 24,
+        ),
+      );
+    }
+
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      onTap: _navigate,
+      showUnselectedLabels: true,
+      selectedItemColor: primaryColor,
+      unselectedItemColor: darkGray,
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+      onTap: (index) => _onItemTapped(context, index),
       items: [
         BottomNavigationBarItem(
-          icon: Image.asset(
-            'assets/ic_notification.png',
-            width: 24,
-            height: 24,
-          ),
-          label: 'Notification',
+          icon: _coloredIcon('assets/ic_notification.png', currentIndex == 0),
+          label: "Notifications",
         ),
         BottomNavigationBarItem(
-          icon: Image.asset(
-            'assets/ic_buy.png',
-            width: 24,
-            height: 24,
-          ),
-          label: 'Orders',
+          icon: _coloredIcon('assets/ic_buy.png', currentIndex == 1),
+          label: "My Orders",
         ),
         BottomNavigationBarItem(
-          icon: Image.asset(
-            'assets/ic_report.png',
-            width: 24,
-            height: 24,
-          ),
-          label: 'Reports',
+          icon: _coloredIcon('assets/ic_report.png', currentIndex == 2),
+          label: "Reports",
         ),
         BottomNavigationBarItem(
-          icon: Image.asset(
-            'assets/ic_setting.png',
-            width: 24,
-            height: 24,
-          ),
-          label: 'Account',
+          icon: _coloredIcon('assets/ic_setting.png', currentIndex == 3),
+          label: "Account",
         ),
       ],
     );
