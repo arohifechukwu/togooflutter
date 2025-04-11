@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:togoo/transaction_screen.dart';
 import 'users_screen.dart';
 import 'approvals_screen.dart';
 import 'admin_report_screen.dart';
@@ -18,7 +19,7 @@ class AdminBottomNavigationMenu extends StatelessWidget {
     AdminHome(),
     UsersScreen(),
     ApprovalsScreen(),
-    AdminReportScreen(),
+    TransactionScreen(),
     SettingsScreen(),
   ];
 

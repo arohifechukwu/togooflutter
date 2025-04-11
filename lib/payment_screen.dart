@@ -135,7 +135,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       await Stripe.instance.presentPaymentSheet();
 
-      // Payment succeeded 🎉
+      // Payment succeeded
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Payment successful!")),
       );
