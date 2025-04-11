@@ -121,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: "Language",
             iconPath: "assets/icons/ic_language.png",
             onTap: () {
-              // TODO: Navigate to Language selection screen
+
             },
           ),
 
